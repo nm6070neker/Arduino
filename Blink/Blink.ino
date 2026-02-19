@@ -27,32 +27,63 @@
 */
 
 // the setup function runs once when you press reset or power the board
+const int led1 = 9;
+const int led2 = 10;
+const int speaker = 11;
+const int fadeLed = 6;
+
+unsigned long previousBlink = 0;
+unsigned long blinkInterval = 100;  // speed of cop lights
+
+unsigned long previousSiren = 0;
+int sirenFreq = 600;
+int sirenStep = 5;
+
+unsigned long previousFade = 0;
+int brightness = 0;
+int fadeAmount = 5;
+
 void setup() {
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT); // Piezo speaker
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(speaker, OUTPUT);
+  pinMode(fadeLed, OUTPUT);
 }
 
 void loop() {
 
-  // Flashing LEDs (cop lights)
-  digitalWrite(10, HIGH);
-  digitalWrite(9, LOW);
-  delay(100);
+  unsigned long currentMillis = millis();
 
-  digitalWrite(9, HIGH);
-  digitalWrite(10, LOW);
-  delay(100);
+  // 🚨 Flashing cop LEDs (steady speed)
+  if (currentMillis - previousBlink >= blinkInterval) {
+    previousBlink = currentMillis;
 
-  // Siren sound - rising tone
-  for (int freq = 600; freq <= 1200; freq += 20) {
-    tone(11, freq);
-    delay(5);
+    digitalWrite(led1, !digitalRead(led1));
+    digitalWrite(led2, !digitalRead(led2));
   }
 
-  // Siren sound - falling tone
-  for (int freq = 1200; freq >= 600; freq -= 20) {
-    tone(11, freq);
-    delay(5);
+  // 🔊 Smooth siren sound
+  if (currentMillis - previousSiren >= 10) {
+    previousSiren = currentMillis;
+
+    tone(speaker, sirenFreq);
+    sirenFreq += sirenStep;
+
+    if (sirenFreq >= 1200 || sirenFreq <= 600) {
+      sirenStep = -sirenStep;  // reverse direction
+    }
+  }
+
+  // 💡 Fading LED (PWM)
+  if (currentMillis - previousFade >= 20) {
+    previousFade = currentMillis;
+
+    analogWrite(fadeLed, brightness);
+    brightness += fadeAmount;
+
+    if (brightness <= 0 || brightness >= 255) {
+      fadeAmount = -fadeAmount;
+    }
   }
 }
+
