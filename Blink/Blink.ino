@@ -28,18 +28,31 @@
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  // initialize digital pin LED_BUILTIN as an output.
-  pinMode(10, OUTPUT);
   pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT); // Piezo speaker
 }
 
-// the loop function runs over and over again forever
 void loop() {
-  digitalWrite(10, HIGH);  // turn the LED on (HIGH is the voltage level)
-  digitalWrite(9, LOW);   // turn the LED off by making the voltage LOW 
-      delay(100);                      // wait for a second
-   // wait for a second
-   digitalWrite(9, HIGH);  // turn the LED on (HIGH is the voltage level)
-  digitalWrite(10, LOW);   // turn the LED off by making the voltage LOW
-  delay(100);                      // wait for a second
+
+  // Flashing LEDs (cop lights)
+  digitalWrite(10, HIGH);
+  digitalWrite(9, LOW);
+  delay(100);
+
+  digitalWrite(9, HIGH);
+  digitalWrite(10, LOW);
+  delay(100);
+
+  // Siren sound - rising tone
+  for (int freq = 600; freq <= 1200; freq += 20) {
+    tone(11, freq);
+    delay(5);
+  }
+
+  // Siren sound - falling tone
+  for (int freq = 1200; freq >= 600; freq -= 20) {
+    tone(11, freq);
+    delay(5);
+  }
 }
